@@ -1,12 +1,8 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/hengkysuryaa/booktheflight/backend/cmd"
-)
+import "github.com/hengkysuryaa/booktheflight/backend/commands"
 
 func main() {
-	fmt.Println("Hello")
-	cmd.RestServer()
+	commands.RestServer()
+	commands.Migration()
 }

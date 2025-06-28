@@ -1,41 +1,46 @@
 package responses
 
 type SeatsItineraryParts struct {
-	SegmentSeatMaps `json:"segmentSeatMaps"`
+	SegmentSeatMaps []SegmentSeatMaps `json:"segmentSeatMaps"`
 }
 
 type SegmentSeatMaps struct {
-	PassengerSeatMaps []PassengerSeatMap `json:"segmentSeatMaps"`
+	PassengerSeatMaps []PassengerSeatMap `json:"passengerSeatMaps"`
 	Segment           `json:"segment"`
 }
 
 type SeatMap struct {
-	RowsDisabledCauses []any   `json:"rowsDisabledCauses"`
-	Aircraft           string  `json:"aircraft"`
-	Cabins             []Cabin `json:"cabins"`
+	RowsDisabledCauses []RowDisabledCause `json:"rowsDisabledCauses"`
+	Aircraft           string             `json:"aircraft"`
+	Cabins             []Cabin            `json:"cabins"`
+}
+
+type RowDisabledCause struct {
+	RowNumber int    `json:"rowNumber"`
+	Cause     string `json:"cause"`
 }
 
 type Seat struct {
 	StorefrontSlotCode  string   `json:"storefrontSlotCode"`
 	Available           bool     `json:"available"`
 	Code                string   `json:"code"`
-	Designations        []any    `json:"designations"`
+	Designations        []string `json:"designations"`
 	Entitled            bool     `json:"entitled"`
 	FeeWaived           bool     `json:"feeWaived"`
 	EntitledRuleID      string   `json:"entitledRuleId"`
 	FeeWaivedRuleID     string   `json:"feeWaivedRuleId"`
 	SeatCharacteristics []string `json:"seatCharacteristics"`
-	Limitations         []any    `json:"limitations"`
+	Limitations         []string `json:"limitations"`
 	RefundIndicator     string   `json:"refundIndicator"`
 	FreeOfCharge        bool     `json:"freeOfCharge"`
 	Prices              struct {
-		Alternatives []Alternative `json:"alternatives"`
+		Alternatives [][]Alternative `json:"alternatives"`
 	} `json:"prices"`
 	Taxes struct {
-		Alternatives []Alternative `json:"alternatives"`
+		Alternatives [][]Alternative `json:"alternatives"`
 	} `json:"taxes"`
 	Total struct {
-		Alternatives []Alternative `json:"alternatives"`
+		Alternatives [][]Alternative `json:"alternatives"`
 	} `json:"total"`
 	OriginallySelected     bool     `json:"originallySelected"`
 	RawSeatCharacteristics []string `json:"rawSeatCharacteristics"`
@@ -65,7 +70,7 @@ type Passenger struct {
 	PassengerNameNumber string `json:"passengerNameNumber"`
 	PassengerDetails    `json:"passengerDetails"`
 	PassengerInfo       `json:"passengerInfo"`
-	Preference          `json:"preferences"`
+	Preferences         Preference `json:"preferences"`
 	DocumentInfo        `json:"documentInfo"`
 }
 
@@ -79,7 +84,7 @@ type PassengerInfo struct {
 	Gender      string   `json:"gender"`
 	Type        string   `json:"type"`
 	Emails      []string `json:"emails"`
-	Phones      []any    `json:"phones"`
+	Phones      []string `json:"phones"`
 	Address     `json:"address"`
 }
 
@@ -101,8 +106,8 @@ type DocumentInfo struct {
 }
 
 type Preference struct {
-	SpecialPreference `json:"specialPreferences"`
-	FrequentFlyer     []FrequentFlyer `json:"frequentFlyer"`
+	SpecialPreferences SpecialPreference `json:"specialPreferences"`
+	FrequentFlyer      []FrequentFlyer   `json:"frequentFlyer"`
 }
 
 type FrequentFlyer struct {
@@ -112,10 +117,10 @@ type FrequentFlyer struct {
 }
 
 type SpecialPreference struct {
-	MealPreference               string `json:"mealPreference"`
-	SeatPreference               string `json:"seatPreference"`
-	SpecialRequests              []any  `json:"specialRequests"`
-	SpecialServiceRequestRemarks []any  `json:"specialServiceRequestRemarks"`
+	MealPreference               string   `json:"mealPreference"`
+	SeatPreference               string   `json:"seatPreference"`
+	SpecialRequests              []string `json:"specialRequests"`
+	SpecialServiceRequestRemarks []string `json:"specialServiceRequestRemarks"`
 }
 
 type PassengerSeatMap struct {
@@ -158,6 +163,6 @@ type Flight struct {
 }
 
 type GetSeat struct {
-	SeatsItineraryParts `json:"seatsItineraryParts"`
-	SelectedSeats       []any `json:"selectedSeats"`
+	SeatsItineraryParts []SeatsItineraryParts `json:"seatsItineraryParts"`
+	SelectedSeats       []any                 `json:"selectedSeats"`
 }
