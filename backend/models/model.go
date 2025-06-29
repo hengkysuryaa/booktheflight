@@ -9,47 +9,52 @@ import (
 
 type Aircraft struct {
 	ID     uint   `gorm:"primaryKey"`
-	Code   string `gorm:"not null"`
+	Code   string `gorm:"not null;uniqueIndex"`
 	Cabins []Cabin
 }
 
 type Cabin struct {
-	ID          uint `gorm:"primaryKey"`
-	AircraftID  uint
-	Deck        string
-	SeatColumns pq.StringArray `gorm:"type:text[]"`
-	FirstRow    int
-	LastRow     int
-	SeatRows    []SeatRow
+	ID                uint `gorm:"primaryKey"`
+	AircraftID        uint
+	Deck              string
+	SeatColumns       pq.StringArray `gorm:"type:text[]"`
+	FirstRow          int
+	LastRow           int
+	SeatRows          []SeatRow
+	RowDisabledCauses []RowDisabledCause
 }
 
 type SeatRow struct {
 	ID        uint `gorm:"primaryKey"`
 	CabinID   uint
 	RowNumber int
+	Codes     pq.StringArray `gorm:"type:text[]"`
 	Seats     []Seat
 }
 
 type Seat struct {
-	ID                 uint `gorm:"primaryKey"`
-	SeatRowID          uint
-	Code               string
-	ColumnLabel        string
-	SlotCode           string
-	Available          bool
-	Entitled           bool
-	FeeWaived          bool
-	FreeOfCharge       bool
-	OriginallySelected bool
-	RefundIndicator    string
-	Segment            string
-	Characteristics    pq.StringArray `gorm:"type:text[]"`
-	RawCharacteristics pq.StringArray `gorm:"type:text[]"`
-	Limitations        pq.StringArray `gorm:"type:text[]"`
-	Designations       pq.StringArray `gorm:"type:text[]"`
-	Prices             []Price
-	Taxes              []SeatTax
-	Totals             []SeatTotal
+	ID          uint `gorm:"primaryKey"`
+	SeatRowID   uint
+	Code        string
+	ColumnLabel string
+	SlotCode    string
+	//Available          bool
+	Entitled            bool
+	FeeWaived           bool
+	EntitledRuleId      string
+	FeeWaivedRuleId     string
+	FreeOfCharge        bool
+	OriginallySelected  bool
+	RefundIndicator     string
+	Segment             string
+	Characteristics     pq.StringArray `gorm:"type:text[]"`
+	RawCharacteristics  pq.StringArray `gorm:"type:text[]"`
+	SlotCharacteristics pq.StringArray `gorm:"type:text[]"`
+	Limitations         pq.StringArray `gorm:"type:text[]"`
+	Designations        pq.StringArray `gorm:"type:text[]"`
+	Prices              []Price
+	Taxes               []SeatTax
+	Totals              []SeatTotal
 }
 
 type Price struct {
@@ -93,7 +98,6 @@ type Passenger struct {
 	Phones               pq.StringArray `gorm:"type:text[]"`
 	Nationality          string
 	DocumentType         string
-	DocumentNumber       string
 	IssuingCountry       string
 	CountryOfBirth       string
 	Street1              string
@@ -132,6 +136,11 @@ type FlightSegment struct {
 	Arrival               time.Time
 	FlightNumber          int
 	AirlineCode           string
+	OperatingFlightNumber int
+	OperatingAirlineCode  string
+	StopAirports          []string `gorm:"type:text[]"`
+	DepartureTerminal     string
+	ArrivalTerminal       string
 	Equipment             string
 	CabinClass            string
 	BookingClass          string

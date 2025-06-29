@@ -21,29 +21,28 @@ type RowDisabledCause struct {
 }
 
 type Seat struct {
-	StorefrontSlotCode  string   `json:"storefrontSlotCode"`
-	Available           bool     `json:"available"`
-	Code                string   `json:"code"`
-	Designations        []string `json:"designations"`
-	Entitled            bool     `json:"entitled"`
-	FeeWaived           bool     `json:"feeWaived"`
-	EntitledRuleID      string   `json:"entitledRuleId"`
-	FeeWaivedRuleID     string   `json:"feeWaivedRuleId"`
-	SeatCharacteristics []string `json:"seatCharacteristics"`
-	Limitations         []string `json:"limitations"`
-	RefundIndicator     string   `json:"refundIndicator"`
-	FreeOfCharge        bool     `json:"freeOfCharge"`
-	Prices              struct {
-		Alternatives [][]Alternative `json:"alternatives"`
-	} `json:"prices"`
-	Taxes struct {
-		Alternatives [][]Alternative `json:"alternatives"`
-	} `json:"taxes"`
-	Total struct {
-		Alternatives [][]Alternative `json:"alternatives"`
-	} `json:"total"`
-	OriginallySelected     bool     `json:"originallySelected"`
-	RawSeatCharacteristics []string `json:"rawSeatCharacteristics"`
+	StorefrontSlotCode     string       `json:"storefrontSlotCode"`
+	Available              bool         `json:"available"`
+	Code                   string       `json:"code"`
+	Designations           []string     `json:"designations"`
+	Entitled               bool         `json:"entitled"`
+	FeeWaived              bool         `json:"feeWaived"`
+	EntitledRuleID         string       `json:"entitledRuleId"`
+	FeeWaivedRuleID        string       `json:"feeWaivedRuleId"`
+	SeatCharacteristics    []string     `json:"seatCharacteristics"`
+	SlotCharacteristics    []string     `json:"slotCharacteristics,omitempty"`
+	Limitations            []string     `json:"limitations"`
+	RefundIndicator        string       `json:"refundIndicator"`
+	FreeOfCharge           bool         `json:"freeOfCharge"`
+	Prices                 Alternatives `json:"prices"`
+	Taxes                  Alternatives `json:"taxes"`
+	Total                  Alternatives `json:"total"`
+	OriginallySelected     bool         `json:"originallySelected"`
+	RawSeatCharacteristics []string     `json:"rawSeatCharacteristics"`
+}
+
+type Alternatives struct {
+	Alternatives [][]Alternative `json:"alternatives"`
 }
 
 type Alternative struct {
@@ -153,13 +152,13 @@ type SegmentOfferInformation struct {
 }
 
 type Flight struct {
-	FlightNumber          int    `json:"flightNumber"`
-	OperatingFlightNumber int    `json:"operatingFlightNumber"`
-	AirlineCode           string `json:"airlineCode"`
-	OperatingAirlineCode  string `json:"operatingAirlineCode"`
-	StopAirports          []any  `json:"stopAirports"`
-	DepartureTerminal     string `json:"departureTerminal"`
-	ArrivalTerminal       string `json:"arrivalTerminal"`
+	FlightNumber          int      `json:"flightNumber"`
+	OperatingFlightNumber int      `json:"operatingFlightNumber"`
+	AirlineCode           string   `json:"airlineCode"`
+	OperatingAirlineCode  string   `json:"operatingAirlineCode"`
+	StopAirports          []string `json:"stopAirports"`
+	DepartureTerminal     string   `json:"departureTerminal"`
+	ArrivalTerminal       string   `json:"arrivalTerminal"`
 }
 
 type GetSeat struct {

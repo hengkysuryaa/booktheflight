@@ -4,99 +4,40 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hengkysuryaa/booktheflight/backend/responses"
+	"github.com/google/uuid"
+	"github.com/hengkysuryaa/booktheflight/backend/services"
 )
 
 type seatController struct {
+	seatSvc services.ISeatService
 }
 
-func NewSeat() seatController {
-	return seatController{}
+func NewSeat(seatSvc services.ISeatService) seatController {
+	return seatController{
+		seatSvc: seatSvc,
+	}
 }
 
 func (s *seatController) Get(c *gin.Context) {
-	c.JSON(http.StatusOK, responses.GetSeat{
-		SeatsItineraryParts: []responses.SeatsItineraryParts{
-			{
-				SegmentSeatMaps: []responses.SegmentSeatMaps{
-					{
-						PassengerSeatMaps: []responses.PassengerSeatMap{
-							{
-								SeatMap: responses.SeatMap{
-									RowsDisabledCauses: []responses.RowDisabledCause{},
-									Cabins: []responses.Cabin{
-										{
-											SeatColumns: []string{},
-											SeatRows: []responses.SeatRow{
-												{
-													SeatCodes: []string{},
-													Seats: []responses.Seat{
-														{
-															RawSeatCharacteristics: []string{},
-															SeatCharacteristics:    []string{},
-															Designations:           []string{},
-															Limitations:            []string{},
-															Prices: struct {
-																Alternatives [][]responses.Alternative "json:\"alternatives\""
-															}{
-																Alternatives: [][]responses.Alternative{
-																	{
-																		{
-																			Amount:   1,
-																			Currency: "MYR",
-																		},
-																	},
-																},
-															},
-															Taxes: struct {
-																Alternatives [][]responses.Alternative "json:\"alternatives\""
-															}{
-																Alternatives: [][]responses.Alternative{
-																	{},
-																},
-															},
-															Total: struct {
-																Alternatives [][]responses.Alternative "json:\"alternatives\""
-															}{
-																Alternatives: [][]responses.Alternative{
-																	{},
-																},
-															},
-														},
-													},
-												},
-											},
-										},
-									},
-									Aircraft: "",
-								},
-								Passenger: responses.Passenger{
-									Preferences: responses.Preference{
-										SpecialPreferences: responses.SpecialPreference{
-											SpecialRequests:              []string{},
-											SpecialServiceRequestRemarks: []string{},
-										},
-										FrequentFlyer: []responses.FrequentFlyer{},
-									},
-									PassengerDetails: responses.PassengerDetails{},
-									PassengerInfo: responses.PassengerInfo{
-										Address: responses.Address{},
-										Emails:  []string{},
-										Phones:  []string{},
-									},
-								},
-							},
-						},
-						Segment: responses.Segment{
-							SegmentOfferInformation: responses.SegmentOfferInformation{},
-							Flight: responses.Flight{
-								StopAirports: []any{},
-							},
-						},
-					},
-				},
-			},
-		},
-		SelectedSeats: []any{},
-	})
+	flightID := c.Request.URL.Query().Get("flight_id")
+	fUuid, err := uuid.Parse(flightID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	passengerID := c.Request.URL.Query().Get("passenger_id")
+	pUuid, err := uuid.Parse(passengerID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	res, err := s.seatSvc.GetSeats(c.Request.Context(), fUuid, pUuid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
 }

@@ -3,21 +3,33 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/hengkysuryaa/booktheflight/backend/models"
 	"github.com/hengkysuryaa/booktheflight/backend/responses"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func Migration() {
-	dsn := ""
+	godotenv.Load()
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_SSLMODE"),
+	)
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect to database")
+		log.Panicf("failed to connect to database: %v", err.Error())
 	}
 
 	db.AutoMigrate(
@@ -45,8 +57,8 @@ func Migration() {
 				UUID:                  uuid.New(),
 				Origin:                seg.Origin,
 				Destination:           seg.Destination,
-				Departure:             parseDate(seg.Departure),
-				Arrival:               parseDate(seg.Arrival),
+				Departure:             parseDate(seg.Departure, "2006-01-02T15:04:05"),
+				Arrival:               parseDate(seg.Arrival, "2006-01-02T15:04:05"),
 				FlightNumber:          seg.FlightNumber,
 				AirlineCode:           seg.AirlineCode,
 				Equipment:             seg.Equipment,
@@ -59,6 +71,11 @@ func Migration() {
 				LayoverDuration:       seg.LayoverDuration,
 				SubjectToGovtApproval: seg.SubjectToGovernmentApproval,
 				SegmentRef:            seg.SegmentRef,
+				OperatingFlightNumber: seg.OperatingFlightNumber,
+				OperatingAirlineCode:  seg.OperatingAirlineCode,
+				StopAirports:          seg.StopAirports,
+				DepartureTerminal:     seg.DepartureTerminal,
+				ArrivalTerminal:       seg.ArrivalTerminal,
 			}
 			db.Create(&flight)
 
@@ -68,7 +85,7 @@ func Migration() {
 					FirstName:            psm.Passenger.PassengerDetails.FirstName,
 					LastName:             psm.Passenger.PassengerDetails.LastName,
 					Gender:               psm.Passenger.PassengerInfo.Gender,
-					DateOfBirth:          parseDate(psm.Passenger.PassengerInfo.DateOfBirth),
+					DateOfBirth:          parseDate(psm.Passenger.PassengerInfo.DateOfBirth, time.DateOnly),
 					Type:                 psm.Passenger.PassengerInfo.Type,
 					Emails:               psm.Passenger.PassengerInfo.Emails,
 					Phones:               psm.Passenger.PassengerInfo.Phones,
@@ -130,26 +147,30 @@ func Migration() {
 						rowModel := models.SeatRow{
 							CabinID:   cabinModel.ID,
 							RowNumber: row.RowNumber,
+							Codes:     row.SeatCodes,
 						}
 						db.Create(&rowModel)
 
 						for _, seat := range row.Seats {
 							seatModel := models.Seat{
-								SeatRowID:          rowModel.ID,
-								Code:               seat.Code,
-								ColumnLabel:        getSeatColumn(seat.Code),
-								SlotCode:           seat.StorefrontSlotCode,
-								Available:          seat.Available,
-								Entitled:           seat.Entitled,
-								FeeWaived:          seat.FeeWaived,
-								FreeOfCharge:       seat.FreeOfCharge,
-								OriginallySelected: seat.OriginallySelected,
-								RefundIndicator:    seat.RefundIndicator,
-								Segment:            flight.SegmentRef,
-								Characteristics:    seat.SeatCharacteristics,
-								RawCharacteristics: seat.RawSeatCharacteristics,
-								Limitations:        seat.Limitations,
-								Designations:       seat.Designations,
+								SeatRowID:   rowModel.ID,
+								Code:        seat.Code,
+								ColumnLabel: getSeatColumn(seat.Code),
+								SlotCode:    seat.StorefrontSlotCode,
+								//Available:          seat.Available,
+								Entitled:            seat.Entitled,
+								FeeWaived:           seat.FeeWaived,
+								FreeOfCharge:        seat.FreeOfCharge,
+								OriginallySelected:  seat.OriginallySelected,
+								RefundIndicator:     seat.RefundIndicator,
+								Segment:             flight.SegmentRef,
+								Characteristics:     seat.SeatCharacteristics,
+								RawCharacteristics:  seat.RawSeatCharacteristics,
+								Limitations:         seat.Limitations,
+								Designations:        seat.Designations,
+								EntitledRuleId:      seat.EntitledRuleID,
+								FeeWaivedRuleId:     seat.FeeWaivedRuleID,
+								SlotCharacteristics: seat.SlotCharacteristics,
 							}
 							db.Create(&seatModel)
 
@@ -180,8 +201,8 @@ func Migration() {
 	fmt.Println("complete")
 }
 
-func parseDate(s string) time.Time {
-	t, _ := time.Parse("2006-01-02T15:04:05", s)
+func parseDate(s string, format string) time.Time {
+	t, _ := time.Parse(format, s)
 	return t
 }
 

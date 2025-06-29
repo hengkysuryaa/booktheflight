@@ -1,8 +1,17 @@
 package main
 
-import "github.com/hengkysuryaa/booktheflight/backend/commands"
+import (
+	"os"
+
+	"github.com/hengkysuryaa/booktheflight/backend/commands"
+)
 
 func main() {
-	commands.RestServer()
-	commands.Migration()
+	if len(os.Args) > 1 {
+		if os.Args[1] == "migration" {
+			commands.Migration()
+		}
+	} else {
+		commands.RestServer()
+	}
 }
