@@ -1,0 +1,108 @@
+.seat-selection-container {
+  padding: 20px;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.flight-details,
+.passenger-details {
+  flex: 1;
+  min-width: 250px;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.seat-map-container {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.seat-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.seat {
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  background-color: #d3d3d3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.seat:hover {
+  background-color: #8bc34a;
+}
+
+.seat.available {
+  background-color: #4caf50;
+}
+
+.seat.unavailable {
+  background-color: #a9a9a9;
+}
+
+.seat.selected {
+  background-color: #388e3c;
+}
+
+.seat-info {
+  margin-top: 20px;
+  background: #b8b6b6;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.seat-details,
+.seat-price {
+  color: #333;
+  margin-top: 10px;
+}
+
+.blank-seat {
+  width: 40px;
+  height: 40px;
+  margin: 4px;
+  visibility: hidden;
+}
+
+.aisle-seat {
+  width: 40px;
+  height: 40px;
+  margin: 4px;
+  visibility: hidden;
+}
+
+.bulkhead-seat {
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  background-color: #cfcfcf;
+  border: 2px dashed #888;
+  pointer-events: none;
+}
+
+.blank-seat.left {
+  margin-right: 10px;
+}
+
+.blank-seat.right {
+  margin-left: 10px;
+}
+
+.wing-area {
+    background-color: #a9a9a9;
+    pointer-events: none;
+}

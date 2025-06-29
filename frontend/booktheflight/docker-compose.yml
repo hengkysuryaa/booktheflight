@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  react-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"  # maps localhost:3000 → nginx:80
+    environment:
+      - NODE_ENV=production
