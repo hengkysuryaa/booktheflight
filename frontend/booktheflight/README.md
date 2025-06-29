@@ -1,6 +1,13 @@
-# Getting Started with Create React App
+# Book The Flight
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Quick start
+
+**Run the server using docker-compose**
+```
+docker-compose down -v && docker-compose up
+```
 
 ## Available Scripts
 
