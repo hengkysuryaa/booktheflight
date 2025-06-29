@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/hengkysuryaa/booktheflight/backend/repository"
 	"github.com/hengkysuryaa/booktheflight/backend/services"
@@ -41,6 +42,15 @@ func NewHandler() http.Handler {
 
 	// define routes
 	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowOriginFunc: func(origin string) bool {
+			return true
+		},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	router.GET("/", func(c *gin.Context) {
 		time.Sleep(5 * time.Second)
 		c.String(http.StatusOK, "Welcome Gin Server")
