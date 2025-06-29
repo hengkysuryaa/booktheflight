@@ -14,21 +14,31 @@
 docker-compose down -v && docker-compose up
 ```
 
-**For local development**
+## For local development
 
-To install all golang dependencies in `go.mod` file
+Install all golang dependencies in `go.mod` file
 ```
 go mod download
 ```
-To migrate data
+Update .env
+```
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+DB_PORT=
+DB_SSLMODE=
+```
+
+Migrate json data to DB
 ```
 go run main.go migration
 ```
-To start the server
+Start the server
 ```
 go run main.go
 ```
-To check the server
+Check the server
 ```
 curl --location 'http://localhost:8080/v1/seat?passenger_id=3b1ea360-3f82-4f59-918e-b7280d64eb76&flight_id=04104ded-8380-4d88-9798-0f28e32a616b'
 ```

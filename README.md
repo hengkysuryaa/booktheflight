@@ -17,3 +17,5 @@ docker-compose down -v && docker-compose up --build
 cd frontend/booktheflight
 docker-compose down -v && docker-compose up --build
 ```
+
+- Open http://localhost:3000/ on browser
