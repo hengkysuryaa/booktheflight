@@ -42,7 +42,7 @@ func (s *seatService) GetSeats(ctx context.Context, flightID, passengerID uuid.U
 		return res, err
 	}
 
-	cabins := mapCabinsToResponse(aircraft.Cabins)
+	cabins := mapCabinsToResponse(aircraft.Cabins, segment.Bookings)
 	rowsDisabled := mapRowDisabledToResponse(aircraft.Cabins)
 	segmentRes := mapSegmentToResponse(segment)
 	passengerRes := mapPassengerToResponse(passenger)
@@ -86,16 +86,16 @@ func mapPassengerToResponse(p models.Passenger) responses.Passenger {
 
 	return responses.Passenger{
 		PassengerIndex:      int(p.ID),
-		PassengerNameNumber: "1",
+		PassengerNameNumber: p.NameNumber,
 		PassengerDetails: responses.PassengerDetails{
 			FirstName: p.FirstName,
 			LastName:  p.LastName,
 		},
 		DocumentInfo: responses.DocumentInfo{
-			IssuingCountry: p.IssuingCountry,
-			CountryOfBirth: p.CountryOfBirth,
-			DocumentType:   p.DocumentType,
-			Nationality:    p.Nationality,
+			IssuingCountry: p.Document.IssuingCountry,
+			CountryOfBirth: p.Document.CountryOfBirth,
+			DocumentType:   p.Document.DocumentType,
+			Nationality:    p.Document.Nationality,
 		},
 		PassengerInfo: responses.PassengerInfo{
 			DateOfBirth: p.DateOfBirth.Format(time.DateOnly),
@@ -104,13 +104,13 @@ func mapPassengerToResponse(p models.Passenger) responses.Passenger {
 			Emails:      p.Emails,
 			Phones:      p.Phones,
 			Address: responses.Address{
-				Street1:     p.Street1,
-				Street2:     p.Street2,
-				Postcode:    p.Postcode,
-				State:       p.State,
-				City:        p.City,
-				Country:     p.Nationality,
-				AddressType: p.AddressType,
+				Street1:     p.Address.Street1,
+				Street2:     p.Address.Street2,
+				Postcode:    p.Address.Postcode,
+				State:       p.Address.State,
+				City:        p.Address.City,
+				Country:     p.Address.Country,
+				AddressType: p.Address.AddressType,
 			},
 		},
 		Preferences: responses.Preference{
@@ -146,8 +146,8 @@ func mapSegmentToResponse(f models.FlightSegment) responses.Segment {
 		},
 		Origin:                      f.Origin,
 		Destination:                 f.Destination,
-		Departure:                   f.Departure.Format("2006-01-02T15:04:05"),
-		Arrival:                     f.Arrival.Format("2006-01-02T15:04:05"),
+		Departure:                   f.Departure.UTC().Format("2006-01-02T15:04:05"),
+		Arrival:                     f.Arrival.UTC().Format("2006-01-02T15:04:05"),
 		BookingClass:                f.BookingClass,
 		LayoverDuration:             f.LayoverDuration,
 		FareBasis:                   f.FareBasis,
@@ -156,14 +156,14 @@ func mapSegmentToResponse(f models.FlightSegment) responses.Segment {
 	}
 }
 
-func mapCabinsToResponse(cabins []models.Cabin) []responses.Cabin {
+func mapCabinsToResponse(cabins []models.Cabin, bookings []models.Booking) []responses.Cabin {
 	var out []responses.Cabin
 	for _, c := range cabins {
 		var seatRows []responses.SeatRow
 		for _, r := range c.SeatRows {
 			var seats []responses.Seat
 			for _, s := range r.Seats {
-				seats = append(seats, mapSeatToResponse(s))
+				seats = append(seats, mapSeatToResponse(s, bookings))
 			}
 			seatRows = append(seatRows, responses.SeatRow{
 				RowNumber: r.RowNumber,
@@ -195,27 +195,34 @@ func mapRowDisabledToResponse(cabins []models.Cabin) []responses.RowDisabledCaus
 	return out
 }
 
-func mapSeatToResponse(s models.Seat) responses.Seat {
+func mapSeatToResponse(s models.Seat, bookings []models.Booking) responses.Seat {
+	bookedMap := make(map[uint]bool)
+	for _, b := range bookings {
+		bookedMap[b.SeatID] = true
+	}
+
 	if len(s.Characteristics) > 0 {
 		return responses.Seat{
-			StorefrontSlotCode:     s.SlotCode,
-			Available:              true, // TODO
-			Code:                   s.Code,
-			Designations:           s.Designations,
-			Entitled:               s.Entitled,
-			FeeWaived:              s.FeeWaived,
-			EntitledRuleID:         s.EntitledRuleId,
-			FeeWaivedRuleID:        s.FeeWaivedRuleId,
-			SeatCharacteristics:    s.Characteristics,
-			Limitations:            s.Limitations,
-			RefundIndicator:        s.RefundIndicator,
-			FreeOfCharge:           s.FreeOfCharge,
-			OriginallySelected:     s.OriginallySelected,
-			RawSeatCharacteristics: s.RawCharacteristics,
-			Prices:                 mapAlt(s.Prices),
-			Taxes:                  mapAlt(s.Taxes),
-			Total:                  mapAlt(s.Totals),
-			SlotCharacteristics:    s.SlotCharacteristics,
+			StorefrontSlotCode:  s.SlotCode,
+			Entitled:            s.Entitled,
+			FeeWaived:           s.FeeWaived,
+			FreeOfCharge:        s.FreeOfCharge,
+			OriginallySelected:  s.OriginallySelected,
+			SlotCharacteristics: s.SlotCharacteristics,
+			Available:           !bookedMap[s.ID],
+			SeatDetail: &responses.SeatDetail{
+				Code:                   s.Code,
+				Designations:           s.Designations,
+				EntitledRuleID:         s.EntitledRuleId,
+				FeeWaivedRuleID:        s.FeeWaivedRuleId,
+				SeatCharacteristics:    s.Characteristics,
+				Limitations:            s.Limitations,
+				RefundIndicator:        s.RefundIndicator,
+				RawSeatCharacteristics: s.RawCharacteristics,
+				Prices:                 mapAlt(s.Prices),
+				Taxes:                  mapAlt(s.Taxes),
+				Total:                  mapAlt(s.Totals),
+			},
 		}
 	} else {
 		return responses.Seat{

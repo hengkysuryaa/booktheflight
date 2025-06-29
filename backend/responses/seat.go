@@ -20,25 +20,29 @@ type RowDisabledCause struct {
 	Cause     string `json:"cause"`
 }
 
-type Seat struct {
-	StorefrontSlotCode     string       `json:"storefrontSlotCode"`
-	Available              bool         `json:"available"`
+type SeatDetail struct {
 	Code                   string       `json:"code"`
 	Designations           []string     `json:"designations"`
-	Entitled               bool         `json:"entitled"`
-	FeeWaived              bool         `json:"feeWaived"`
 	EntitledRuleID         string       `json:"entitledRuleId"`
 	FeeWaivedRuleID        string       `json:"feeWaivedRuleId"`
 	SeatCharacteristics    []string     `json:"seatCharacteristics"`
-	SlotCharacteristics    []string     `json:"slotCharacteristics,omitempty"`
 	Limitations            []string     `json:"limitations"`
 	RefundIndicator        string       `json:"refundIndicator"`
-	FreeOfCharge           bool         `json:"freeOfCharge"`
 	Prices                 Alternatives `json:"prices"`
 	Taxes                  Alternatives `json:"taxes"`
 	Total                  Alternatives `json:"total"`
-	OriginallySelected     bool         `json:"originallySelected"`
 	RawSeatCharacteristics []string     `json:"rawSeatCharacteristics"`
+}
+
+type Seat struct {
+	SlotCharacteristics []string `json:"slotCharacteristics,omitempty"`
+	StorefrontSlotCode  string   `json:"storefrontSlotCode"`
+	Available           bool     `json:"available"`
+	Entitled            bool     `json:"entitled"`
+	FeeWaived           bool     `json:"feeWaived"`
+	FreeOfCharge        bool     `json:"freeOfCharge"`
+	OriginallySelected  bool     `json:"originallySelected"`
+	*SeatDetail
 }
 
 type Alternatives struct {

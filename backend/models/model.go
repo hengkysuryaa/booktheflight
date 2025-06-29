@@ -33,12 +33,11 @@ type SeatRow struct {
 }
 
 type Seat struct {
-	ID          uint `gorm:"primaryKey"`
-	SeatRowID   uint
-	Code        string
-	ColumnLabel string
-	SlotCode    string
-	//Available          bool
+	ID                  uint `gorm:"primaryKey"`
+	SeatRowID           uint
+	Code                string
+	ColumnLabel         string
+	SlotCode            string
 	Entitled            bool
 	FeeWaived           bool
 	EntitledRuleId      string
@@ -88,6 +87,7 @@ type RowDisabledCause struct {
 type Passenger struct {
 	ID                   uint      `gorm:"primaryKey"`
 	UUID                 uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();uniqueIndex"`
+	NameNumber           string
 	FirstName            string
 	LastName             string
 	Type                 string
@@ -96,18 +96,31 @@ type Passenger struct {
 	DateOfBirth          time.Time
 	Emails               pq.StringArray `gorm:"type:text[]"`
 	Phones               pq.StringArray `gorm:"type:text[]"`
-	Nationality          string
-	DocumentType         string
-	IssuingCountry       string
-	CountryOfBirth       string
-	Street1              string
-	Street2              string
-	City                 string
-	State                string
-	Postcode             string
-	AddressType          string
+	Document             PassengerDocument
+	Address              PassengerAddress
 	Preferences          PassengerPreference
 	FrequentFlyers       []FrequentFlyer
+}
+
+type PassengerAddress struct {
+	ID          uint `gorm:"primaryKey"`
+	PassengerID uint
+	Street1     string
+	Street2     string
+	City        string
+	State       string
+	Country     string
+	Postcode    string
+	AddressType string
+}
+
+type PassengerDocument struct {
+	ID             uint `gorm:"primaryKey"`
+	PassengerID    uint
+	Nationality    string
+	DocumentType   string
+	IssuingCountry string
+	CountryOfBirth string
 }
 
 type PassengerPreference struct {

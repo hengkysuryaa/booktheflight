@@ -30,7 +30,12 @@ func (r *repository) GetFlight(ctx context.Context, id uuid.UUID) (f models.Flig
 }
 
 func (r *repository) GetPassenger(ctx context.Context, id uuid.UUID) (p models.Passenger, err error) {
-	err = r.db.Preload("Preferences").Preload("FrequentFlyers").Where("uuid = ?", id).First(&p).Error
+	err = r.db.
+		Preload("Document").
+		Preload("Address").
+		Preload("Preferences").
+		Preload("FrequentFlyers").
+		Where("uuid = ?", id).First(&p).Error
 	return
 }
 
